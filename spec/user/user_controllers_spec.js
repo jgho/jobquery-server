@@ -329,8 +329,10 @@ describe('User Controller', function () {
                 expect(usersWithTags.statusCode).toEqual(200);
                 expect(usersWithTags.body[0].tags[0].tag.name)
                   .toEqual(tagMockData.valid3.name);
+                expect(usersWithTags.body[0].tags[0].score).toEqual(0);
                 expect(usersWithTags.body[1].tags[0].tag.name)
                   .toEqual(tagMockData.valid3.name);
+                expect(usersWithTags.body[1].tags[0].score).toEqual(0);
 
                 done();
               });
