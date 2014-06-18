@@ -3,6 +3,7 @@
 'use strict';
 
 var mongoose = require('mongoose');
+var User = require('../user/user_model.js');
 
 var mongoOID = mongoose.Schema.Types.ObjectId;
 
@@ -19,6 +20,16 @@ var tagSchema = new mongoose.Schema({
 tagSchema.pre('save', function (next) {
   this.updatedAt = new Date();
   next();
+});
+
+tagSchema.post('save', function (doc) {
+  // add this new tag to each user
+  User.find(function (err, users) {
+    users.forEach(function (user) {
+      user.tags.push({tag: doc._id, score: 0});
+      user.save();
+    });
+  });
 });
 
 module.exports = exports = mongoose.model('Tag', tagSchema);

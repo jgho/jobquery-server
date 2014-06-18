@@ -280,6 +280,7 @@ describe('User Controller', function () {
             .end(function (err, res3) {
               if (err) return done(err);
               expect(res3.statusCode).toEqual(200);
+              delete userMockData.minimum2.tags;
               done();
             });
           });
@@ -288,4 +289,56 @@ describe('User Controller', function () {
     });
   });
 
+  it('should have new tags automatically added to existing users', function (done) {
+    // create two new users
+    request(app)
+    .post('/api/users')
+    .send(userMockData.valid)
+    .end(function (err, user1) {
+      if (err) return done(err);
+      expect(user1.statusCode).toEqual(201);
+
+      request(app)
+      .post('/api/users')
+      .send(userMockData.minimum2)
+      .end(function (err, user2) {
+        if (err) return done(err);
+        expect(user2.statusCode).toEqual(201);
+
+        // check get of two users
+        request(app)
+        .get('/api/users')
+        .end(function (err, users) {
+          if (err) return done(err);
+          expect(users.statusCode).toEqual(200);
+
+          // create a tag
+          request(app)
+          .post('/api/tags')
+          .send(tagMockData.valid3)
+          .end(function (err, tag) {
+            if (err) return done(err);
+            expect(tag.statusCode).toEqual(201);
+
+            // check both users have the created tag
+            var delay = function () {
+              request(app)
+              .get('/api/users')
+              .end(function (err, usersWithTags) {
+                if (err) return done(err);
+                expect(usersWithTags.statusCode).toEqual(200);
+                expect(usersWithTags.body[0].tags[0].tag.name)
+                  .toEqual(tagMockData.valid3.name);
+                expect(usersWithTags.body[1].tags[0].tag.name)
+                  .toEqual(tagMockData.valid3.name);
+
+                done();
+              });
+            };
+            setTimeout(delay, 200); // post save middleware needs time to save!
+          });
+        });
+      });
+    });
+  });
 });
