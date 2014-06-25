@@ -34,6 +34,14 @@ module.exports = exports = {
             {path: 'opportunity.category'});
         })
         .then(function (results) {
+          // filter opportunities that are not yet approved
+          for (var k = 0; k < results.length; k += 1) {
+            if (!results[k].approved) {
+              results.splice(k, 1);
+              k -= 1;
+            }
+          }
+
           // hide non-public tags from users
           for (var i = 0; i < results.length; i += 1) {
             for (var j = 0; j < results[i].opportunity.tags.length; j += 1) {
@@ -44,6 +52,7 @@ module.exports = exports = {
               }
             }
           }
+
           match = results;
           return;
         });
@@ -108,13 +117,20 @@ module.exports = exports = {
 
       Opportunity
       .find()
-      .select('active company jobTitle description category questions createdAt updatedAt')
+      .select('active approved company jobTitle description category questions createdAt updatedAt')
       .populate([
         {path: 'category', select: 'name'},
         {path: 'company', select: 'name'}
       ])
       .exec()
       .then(function (data) {
+          // filter opportunities that are not yet approved
+          for (var i = 0; i < data.length; i += 1) {
+            if (!data[i].approved) {
+              data.splice(i, 1);
+              i -= 1;
+            }
+          }
           opportunities = data;
           return;
       })
