@@ -24,6 +24,15 @@ module.exports = exports = {
         res.json(500, err);
         return;
       }
+      // filter opportunities that are not yet approved
+      for (var i = 0; i < companies.length; i += 1) {
+        for (var j = 0; j < companies[i].opportunities.length; j += 1) {
+          if (!companies[i].opportunities[j].approved) {
+            companies[i].opportunities.splice(j, 1);
+            j -= 1;
+          }
+        }
+      }
       res.json(200, companies);
     });
   }

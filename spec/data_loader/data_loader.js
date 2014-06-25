@@ -185,6 +185,7 @@ var populate = function() {
                         company:        companyResults[index]._id,
                         jobTitle:       faker.Company.bs(),
                         description:    faker.Company.catchPhrase(),
+                        approved:       Math.random() > 0.2 ? true : false,
                         tags:           allTags,
                         links:          [{title : faker.random.catch_phrase_descriptor(), url : faker.Image.imageUrl()}],
                         notes:          [{date : new Date(), text : faker.Lorem.sentence()}],
